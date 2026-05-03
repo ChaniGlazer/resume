@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מחולל רזומה מקצועי</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #007aff;
+            --bg: #f2f2f7;
+            --white: #ffffff;
+            --border: #d1d1d6;
+        }
+
+        body { font-family: Arial, Helvetica, sans-serif; background-color: var(--bg); margin: 0; padding: 20px; direction: rtl; }
+        .container { max-width: 1400px; margin: auto; display: grid; grid-template-columns: 450px 1fr; gap: 20px; }
+        .editor { background: var(--white); padding: 20px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-height: 92vh; overflow-y: auto; }
+        .field-group { background: #f9f9fb; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #eee; }
+        label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 5px; color: var(--primary); }
+        input, textarea, select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; margin-bottom: 10px; font-size: 14px; }
+        
+        .design-picker { display: flex; gap: 10px; margin-bottom: 15px; }
+        .design-btn { flex: 1; padding: 10px; border: 1px solid var(--accent); background: white; border-radius: 8px; cursor: pointer; transition: 0.3s; }
+        .design-btn.active { background: var(--accent); color: white; }
+
+        .entry-card { background: white; border: 1px solid var(--border); padding: 12px; border-radius: 8px; margin-bottom: 10px; position: relative; border-right: 4px solid var(--accent); }
+        .btn-add { width: 100%; padding: 10px; border: 2px dashed var(--border); background: none; border-radius: 8px; cursor: pointer; color: #666; font-weight: bold; margin-bottom: 15px; }
+        .btn-remove { position: absolute; left: 5px; top: 5px; background: #ff3b30; color: white; border: none; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; }
+        .btn-download { width: 100%; padding: 15px; background: var(--accent); color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; position: sticky; bottom: 0; }
+
+        .preview-side { background: #525659; border-radius: 15px; padding: 40px 20px; display: flex; justify-content: center; height: 92vh; overflow-y: auto; }
+        #resume-holder { background: white; width: 210mm; min-height: 297mm; padding: 15mm; box-sizing: border-box; position: relative; display: flex; flex-direction: column; }
+
+        #export-area { direction: rtl; color: #000; font-family: Arial, sans-serif; width: 100%; letter-spacing: 0.3px; flex-grow: 1; }
+        .header-layout { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+        
+        /* תיקון התמונה למניעת מריחה */
+        #out-photo-img { 
+            width: 100px; 
+            height: 100px; 
+            min-width: 100px;
+            min-height: 100px;
+            border-radius: 50%; 
+            object-fit: cover; 
+            object-position: center;
+            display: none; 
+            margin-right: 20px; 
+            border: 1px solid #ddd;
+        }
+
+        .design-classic .pdf-section-title { background: #eff2f7; border-right: 6px solid var(--accent); padding: 6px 15px; font-weight: bold; margin-bottom: 10px; }
+        .design-modern .pdf-section-title { border-bottom: 2px solid var(--accent); padding: 2px 0; font-weight: bold; font-size: 20px; margin-bottom: 15px; color: var(--accent); }
+        .design-soft .pdf-section-title { background: #f0f0f0; border-radius: 20px; padding: 6px 20px; font-weight: bold; margin-bottom: 10px; text-align: center; }
+
+        .pdf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .pdf-item { font-size: 15px; margin-bottom: 5px; line-height: 1.4; }
+
+        .company-footer {
+            text-align: left;
+            opacity: 0.7;
+            font-size: 7px;
+            color: #7f8c8d;
+            margin-top: auto;
+            padding-bottom: 5px;
+            padding-left: 5px;
+        }
+        .company-footer b { color: #2c3e50; font-size: 9px; display: block; margin-bottom: 1px; }
+    </style>
+</head>
+<body class="design-classic">
+
+<div class="container">
+    <div class="editor">
+        <h2>בחירת עיצוב</h2>
+        <div class="design-picker">
+            <button class="design-btn active" onclick="setDesign('classic', this)">קלאסי</button>
+            <button class="design-btn" onclick="setDesign('modern', this)">מודרני</button>
+            <button class="design-btn" onclick="setDesign('soft', this)">רך</button>
+        </div>
+
+        <div class="field-group">
+            <label>תמונת פרופיל</label>
+            <input type="file" accept="image/*" onchange="handleImage(this)">
+            <label>שם מלא</label><input id="in-name" oninput="update()" placeholder="ישראל ישראלי">
+            <div style="display: flex; gap: 10px;">
+                <div style="flex:1"><label>גיל</label><input id="in-age" oninput="update()" placeholder="20"></div>
+                <div style="flex:1"><label>גובה</label><input id="in-height" oninput="update()" placeholder="1.75"></div>
+            </div>
+            <label>עיר מגורים</label><input id="in-city" oninput="update()" placeholder="בית שמש">
+            <label>תכונות אופי</label><textarea id="in-traits" oninput="update()" rows="2"></textarea>
+        </div>
+
+        <div class="field-group">
+            <label>עיסוק האב</label><input id="in-f-job" oninput="update()" placeholder="מחנך">
+            <label>עיסוק האם</label><input id="in-m-job" oninput="update()" placeholder="עקרת בית">
+            <label>משפחת האם בית</label><input id="in-m-maiden" oninput="update()" placeholder="פרנקל">
+        </div>
+
+        <h3>אחים ואחיות</h3>
+        <div id="sib-list"></div>
+        <button class="btn-add" onclick="addSibling()">+ הוסף אח/אחות</button>
+
+        <h3>אנשי קשר והמלצות</h3>
+        <div id="phone-list"></div>
+        <button class="btn-add" onclick="addPhone()">+ הוסף איש קשר</button>
+
+        <button class="btn-download" onclick="generatePDF()">הורד PDF</button>
+    </div>
+
+    <div class="preview-side">
+        <div id="resume-holder">
+            <div id="export-area" class="design-classic">
+                <div class="header-layout">
+                    <div style="flex: 1; text-align: center;">
+                        <h1 id="out-name" style="margin: 0; font-size: 32px;">שם מלא</h1>
+                        <div style="border-bottom: 2px solid #2c3e50; padding-bottom: 8px; margin-top: 10px; display: flex; justify-content: center; gap: 20px; font-size: 18px;">
+                            <span>גיל: <span id="out-age">--</span></span>
+                            <span>גובה: <span id="out-height">--</span></span>
+                            <span>עיר: <span id="out-city">--</span></span>
+                        </div>
+                    </div>
+                    <img id="out-photo-img" src="">
+                </div>
+
+                <div class="pdf-section">
+                    <div class="pdf-section-title">תכונות אופי</div>
+                    <div id="out-traits" style="padding-right: 15px;">--</div>
+                </div>
+
+                <div class="pdf-section">
+                    <div class="pdf-section-title">פרטי הורים</div>
+                    <div class="pdf-grid" style="padding-right: 15px;">
+                        <div class="pdf-item"><b>עיסוק האב:</b> <span id="out-f-job">--</span></div>
+                        <div class="pdf-item"><b>עיסוק האם:</b> <span id="out-m-job">--</span></div>
+                        <div class="pdf-item" style="grid-column: span 2;"><b>משפחת האם בית:</b> <span id="out-m-maiden">--</span></div>
+                    </div>
+                </div>
+
+                <div class="pdf-section">
+                    <div class="pdf-section-title">אחים ואחיות</div>
+                    <div id="out-siblings" class="pdf-grid" style="padding-right: 15px;"></div>
+                </div>
+
+                <div class="pdf-section">
+                    <div class="pdf-section-title">אנשי קשר והמלצות</div>
+                    <div id="out-phones" class="pdf-grid" style="padding-right: 15px;"></div>
+                </div>
+            </div>
+            <div class="company-footer">
+                <b>codeBloom</b>
+                פתרונות טכנולוגיים למגזר החרדי
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function setDesign(type, btn) {
+        document.querySelectorAll('.design-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('export-area').className = 'design-' + type;
+    }
+
+    function handleImage(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = document.getElementById('out-photo-img');
+                img.src = e.target.result;
+                img.style.display = 'block';
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function addSibling() {
+        const div = document.createElement('div');
+        div.className = 'entry-card';
+        div.innerHTML = `
+            <button class="btn-remove" onclick="this.parentElement.remove(); update();">✕</button>
+            <select onchange="updateSibUI(this)"><option value="u">רווק/ה</option><option value="m">נשוי/ה</option></select>
+            <input placeholder="שם האח/אחות" oninput="update()">
+            <div class="extra-info"><input placeholder="מקום לימודים / עיסוק" oninput="update()"></div>
+        `;
+        document.getElementById('sib-list').appendChild(div);
+        update();
+    }
+
+    function updateSibUI(select) {
+        const extra = select.parentElement.querySelector('.extra-info');
+        if (select.value === 'm') {
+            extra.innerHTML = `
+                <input placeholder="עיסוק האח/אחות" oninput="update()">
+                <input placeholder="נשוי/ה ל..." oninput="update()">
+                <input placeholder="משפחת בן הזוג" oninput="update()">
+                <input placeholder="עיסוק בן הזוג" oninput="update()">
+                <input placeholder="עיר מגורים" oninput="update()">
+            `;
+        } else {
+            extra.innerHTML = `<input placeholder="מקום לימודים / עיסוק" oninput="update()">`;
+        }
+        update();
+    }
+
+    function addPhone() {
+        const div = document.createElement('div');
+        div.className = 'entry-card';
+        div.innerHTML = `
+            <button class="btn-remove" onclick="this.parentElement.remove(); update();">✕</button>
+            <input placeholder="שם" oninput="update()"><input placeholder="תפקיד" oninput="update()"><input placeholder="טלפון" oninput="update()">
+        `;
+        document.getElementById('phone-list').appendChild(div);
+        update();
+    }
+
+    function update() {
+        document.getElementById('out-name').innerText = document.getElementById('in-name').value || "שם מלא";
+        document.getElementById('out-age').innerText = document.getElementById('in-age').value || "--";
+        document.getElementById('out-height').innerText = document.getElementById('in-height').value || "--";
+        document.getElementById('out-city').innerText = document.getElementById('in-city').value || "--";
+        document.getElementById('out-traits').innerText = document.getElementById('in-traits').value || "--";
+        document.getElementById('out-f-job').innerText = document.getElementById('in-f-job').value || "--";
+        document.getElementById('out-m-job').innerText = document.getElementById('in-m-job').value || "--";
+        document.getElementById('out-m-maiden').innerText = document.getElementById('in-m-maiden').value || "--";
+
+        const sibOut = document.getElementById('out-siblings');
+        sibOut.innerHTML = '';
+        document.querySelectorAll('#sib-list .entry-card').forEach(card => {
+            const name = card.querySelector('input').value;
+            const status = card.querySelector('select').value;
+            const extras = card.querySelectorAll('.extra-info input');
+            if(name) {
+                const item = document.createElement('div');
+                item.className = 'pdf-item';
+                if(status === 'u') {
+                    item.innerHTML = `<b>${name}</b><br>${extras[0].value}`;
+                } else {
+                    item.innerHTML = `<b>${name}</b>, ${extras[0].value}<br>נשוי/ה ל${extras[1].value}, משפחת ${extras[2].value}<br>עיסוק בן הזוג: ${extras[3].value}, עיר: ${extras[4].value}`;
+                }
+                sibOut.appendChild(item);
+            }
+        });
+
+        const phoneOut = document.getElementById('out-phones');
+        phoneOut.innerHTML = '';
+        document.querySelectorAll('#phone-list .entry-card').forEach(card => {
+            const inputs = card.querySelectorAll('input');
+            if(inputs[0].value) {
+                const item = document.createElement('div');
+                item.className = 'pdf-item';
+                item.innerHTML = `<b>${inputs[0].value}</b>, ${inputs[1].value}<br>${inputs[2].value}`;
+                phoneOut.appendChild(item);
+            }
+        });
+    }
+
+    function generatePDF() {
+        const element = document.getElementById('resume-holder');
+        const opt = {
+            margin: 5,
+            filename: 'resume.pdf',
+            image: { type: 'jpeg', quality: 1 },
+            html2canvas: { scale: 3, useCORS: true, letterRendering: true },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        html2pdf().set(opt).from(element).save();
+    }
+
+    window.onload = () => { addSibling(); addPhone(); };
+</script>
+
+</body>
+</html>
