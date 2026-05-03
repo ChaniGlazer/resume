@@ -67,6 +67,99 @@
             padding-left: 5px;
         }
         .company-footer b { color: #2c3e50; font-size: 9px; display: block; margin-bottom: 1px; }
+        /* =========================
+   רספונסיביות לטלפונים
+========================= */
+
+/* טאבלטים */
+@media (max-width: 1100px) {
+    .container {
+        grid-template-columns: 1fr;
+    }
+
+    .preview-side {
+        height: auto;
+        padding: 20px 10px;
+    }
+
+    #resume-holder {
+        width: 100%;
+        transform: scale(0.9);
+        transform-origin: top center;
+    }
+}
+
+/* טלפונים */
+@media (max-width: 768px) {
+
+    body {
+        padding: 10px;
+    }
+
+    .container {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .editor {
+        max-height: none;
+    }
+
+    .preview-side {
+        height: auto;
+        padding: 10px;
+    }
+
+    /* הקטנת הדף כדי שייכנס למסך */
+    #resume-holder {
+        width: 210mm;
+        transform: scale(0.65);
+        transform-origin: top center;
+    }
+
+    /* כותרת - מעבר למבנה אנכי */
+    .header-layout {
+        flex-direction: column-reverse;
+        align-items: center;
+        text-align: center;
+    }
+
+    #out-photo-img {
+        margin: 0 0 10px 0;
+    }
+
+    /* גרידים הופכים לטור אחד */
+    .pdf-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* כפתור הורדה נוח לאגודל */
+    .btn-download {
+        font-size: 16px;
+        padding: 12px;
+    }
+}
+
+/* טלפונים קטנים מאוד */
+@media (max-width: 480px) {
+
+    #resume-holder {
+        transform: scale(0.55);
+    }
+
+    h1 {
+        font-size: 22px !important;
+    }
+
+    .pdf-section-title {
+        font-size: 14px !important;
+    }
+
+    .pdf-item {
+        font-size: 12px;
+    }
+}
     </style>
 </head>
 <body class="design-classic">
@@ -88,14 +181,14 @@
                 <div style="flex:1"><label>גיל</label><input id="in-age" oninput="update()" placeholder="20"></div>
                 <div style="flex:1"><label>גובה</label><input id="in-height" oninput="update()" placeholder="1.75"></div>
             </div>
-            <label>עיר מגורים</label><input id="in-city" oninput="update()" placeholder="בית שמש">
+            <label>עיר מגורים</label><input id="in-city" oninput="update()" placeholder="ירושלים">
             <label>תכונות אופי</label><textarea id="in-traits" oninput="update()" rows="2"></textarea>
         </div>
 
         <div class="field-group">
             <label>עיסוק האב</label><input id="in-f-job" oninput="update()" placeholder="מחנך">
             <label>עיסוק האם</label><input id="in-m-job" oninput="update()" placeholder="עקרת בית">
-            <label>משפחת האם בית</label><input id="in-m-maiden" oninput="update()" placeholder="פרנקל">
+            <label>משפחת האם בית</label><input id="in-m-maiden" oninput="update()" placeholder="כהן">
         </div>
 
         <h3>אחים ואחיות</h3>
