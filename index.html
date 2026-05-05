@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מחולל רזומה מקצועי למגזר החרדי - codeBloom</title>
+    
+    <!-- הגדרות לחיפוש בגוגל (SEO) - לא משפיע על העיצוב -->
+    <title>יצירת רזומה לשידוכים | מחולל קורות חיים מקצועי - codeBloom</title>
+    <meta name="description" content="הכלי המוביל ליצירת רזומה לשידוכים בצורה קלה, מקצועית ומכובדת. מגוון עיצובים מותאמים למגזר החרדי, כולל אפשרות להורדת PDF מוכן תוך דקות.">
+    <meta name="keywords" content="רזומה לשידוכים, קורות חיים לשידוכים, בניית רזומה, מחולל רזומה, טופס שידוכים, codeBloom">
+
     <!-- ספריות ופונטים -->
     <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;700&family=Heebo:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.css" />
@@ -23,15 +28,7 @@
             font-family: 'Assistant', sans-serif; 
             background: var(--bg-gradient); 
             color: white; margin: 0; padding: 20px;
-            display: flex; flex-direction: column; align-items: center;
-        }
-
-        /* כותרת SEO */
-        .seo-title {
-            text-align: center;
-            margin-bottom: 30px;
-            color: var(--gold);
-            font-family: 'Heebo', sans-serif;
+            display: flex; justify-content: center;
         }
 
         .app-wrapper {
@@ -47,6 +44,18 @@
             height: 90vh; overflow-y: auto; position: sticky; top: 20px;
         }
 
+        .progress-container {
+            height: 8px; background: rgba(255,255,255,0.1);
+            border-radius: 4px; margin-bottom: 20px; overflow: hidden;
+        }
+        #progress-fill {
+            height: 100%; background: linear-gradient(90deg, var(--emerald), var(--gold));
+            width: 33%; transition: 0.4s ease;
+        }
+
+        .step-content { display: none; }
+        .step-content.active { display: block; }
+
         input, textarea, select {
             width: 100%; background: rgba(255,255,255,0.1);
             border: 1px solid rgba(255,255,255,0.2);
@@ -60,12 +69,14 @@
             background: var(--emerald); color: white; padding: 12px; 
             border: none; border-radius: 8px; cursor: pointer; 
             display: none; width: 100%; margin-bottom: 15px; 
-            font-weight: bold; font-size: 16px;
+            font-weight: bold; font-size: 16px; transition: 0.3s;
         }
 
         .btn-nav { padding: 12px 25px; border-radius: 10px; border: none; cursor: pointer; font-weight: bold; transition: 0.3s; }
         .btn-next { background: var(--gold); color: var(--navy); }
         .btn-prev { background: transparent; border: 1px solid white; color: white; margin-left: 10px; }
+
+        .entry-card { background: rgba(255,255,255,0.05); border-right: 3px solid var(--gold); padding: 15px; border-radius: 12px; margin-bottom: 15px; position: relative; }
 
         .preview-side {
             background: rgba(0,0,0,0.2); border-radius: 20px; padding: 30px;
@@ -78,6 +89,7 @@
         }
         .style-btn.active { background: var(--gold); color: var(--navy); border-color: var(--gold); }
 
+        /* דף ה-PDF */
         #resume-holder {
             width: 210mm; height: 297mm; background: white; color: #1a1a1a;
             padding: 10mm 15mm 20mm 15mm; box-sizing: border-box; position: relative;
@@ -100,8 +112,9 @@
             display: none; margin: 0 0 10px auto;
         }
 
+        /* עיצוב פרימיום */
         .premium-style .pdf-header { text-align: center; border-bottom: 2px solid var(--navy); padding-bottom: 10px; margin-bottom: 20px; }
-        .premium-style .pdf-header h1 { margin: 0; font-size: 30px; color: var(--navy); font-family: 'Heebo', sans-serif; }
+        .premium-style .pdf-header h1 { margin: 0; font-size: 30px; color: var(--navy); font-family: 'Heebo', sans-serif; text-align: center; }
         .premium-style .pdf-section-title {
             background: #f8f9fa; border-right: 5px solid var(--gold);
             padding: 6px 12px; font-weight: bold; margin: 15px 0 10px; color: var(--navy);
@@ -111,6 +124,7 @@
         .premium-style .pdf-row { border-bottom: 1px solid #f0f0f0; padding: 4px 0; font-size: 14px; }
         .premium-style .profile-img-preview { margin: 0 auto 10px; }
 
+        /* עיצוב מינימלי */
         .minimal-style .pdf-header { text-align: right; border: none; margin-bottom: 15px; }
         .minimal-style .pdf-header h1 { font-size: 24px; margin-bottom: 5px; color: #000; font-weight: bold; }
         .minimal-style .pdf-section-title {
@@ -123,12 +137,13 @@
 </head>
 <body class="minimal-style">
 
-<h1 class="seo-title">מחולל רזומה מקצועי למגזר החרדי - יצירת רזומה בבניית קודBloom</h1>
-
 <div class="app-wrapper">
     <div class="editor-container">
-        <h2>עורך רזומה - codeBloom</h2>
+        <div class="progress-container"><div id="progress-fill"></div></div>
+
+        <!-- שלב 1: אישי ותמונה -->
         <div id="step-1" class="step-content active">
+            <h2>פרטים אישיים</h2>
             <label>📸 תמונת פרופיל</label>
             <input type="file" id="upload-img" accept="image/*">
             <div id="cropper-v"></div>
@@ -147,11 +162,12 @@
             <button class="btn-nav btn-next" onclick="setStep(2)">המשך למשפחה ⮕</button>
         </div>
 
+        <!-- שלב 2: משפחה -->
         <div id="step-2" class="step-content">
             <h2>פרטי משפחה</h2>
             <label>עיסוק האב</label><input id="in-f-job" oninput="update()">
             <label>עיסוק האם</label><input id="in-m-job" oninput="update()">
-            <label>שם משפחה מהבית</label><input id="in-m-maiden" oninput="update()">
+            <label>האם לבית (שם משפחה)</label><input id="in-m-maiden" oninput="update()">
             
             <h3>אחים ואחיות</h3>
             <div id="sib-list"></div>
@@ -163,6 +179,7 @@
             </div>
         </div>
 
+        <!-- שלב 3: המלצות -->
         <div id="step-3" class="step-content">
             <h2>אנשי קשר</h2>
             <div id="phone-list"></div>
@@ -175,6 +192,7 @@
         </div>
     </div>
 
+    <!-- תצוגה מקדימה -->
     <div class="preview-side">
         <div class="style-selector">
             <button class="style-btn" id="btn-premium" onclick="toggleStyle('premium')">עיצוב פרימיום</button>
@@ -234,6 +252,7 @@
     function setStep(s) {
         document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
         document.getElementById('step-'+s).classList.add('active');
+        document.getElementById('progress-fill').style.width = (s * 33.3) + '%';
     }
 
     document.getElementById('upload-img').addEventListener('change', function() {
@@ -288,7 +307,7 @@
                 <input placeholder="עיסוק האח/אחות" oninput="update()">
             `;
         } else {
-            extra.innerHTML = `<input placeholder="עיסוק" oninput="update()">`;
+            extra.innerHTML = `<input placeholder="עיסוק / מקום לימודים" oninput="update()">`;
         }
     }
 
@@ -347,7 +366,7 @@
         const el = document.getElementById('resume-holder');
         const opt = {
             margin: 0,
-            filename: 'resume-codeBloom.pdf',
+            filename: 'resume-shiduchim.pdf',
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: { scale: 2, letterRendering: true, useCORS: true },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
