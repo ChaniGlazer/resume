@@ -136,25 +136,7 @@
     </style>
 </head>
 <body class="minimal-style">
-<!-- SEO Content -->
-<div style="position:absolute; top:-9999px; right:-9999px;">
-    <h1>יצירת רזומה לשידוכים אונליין</h1>
 
-    <h2>רזומה לשידוכים</h2>
-    <p>
-        מחפשים דרך קלה להכין רזומה לשידוכים? הכלי שלנו מאפשר יצירת רזומה מקצועי, מסודר ומכובד תוך דקות.
-    </p>
-
-    <h2>איך להכין רזומה לשידוכים</h2>
-    <p>
-        רזומה לשידוכים כולל פרטים אישיים, פרטי משפחה, תכונות אופי והמלצות. חשוב להציג את המידע בצורה ברורה ונעימה לקריאה.
-    </p>
-
-    <h2>טופס שידוכים מקצועי</h2>
-    <p>
-        באמצעות מחולל הרזומה ניתן ליצור טופס שידוכים מעוצב ולהוריד אותו כקובץ PDF מוכן לשליחה.
-    </p>
-</div>
 <div class="app-wrapper">
     <div class="editor-container">
         <div class="progress-container"><div id="progress-fill"></div></div>
@@ -162,7 +144,7 @@
         <!-- שלב 1: אישי ותמונה -->
         <div id="step-1" class="step-content active">
             <h2>פרטים אישיים</h2>
-            <label>📸 תמונת פרופיל (אופציונלי)</label>
+            <label>📸 תמונת פרופיל</label>
             <input type="file" id="upload-img" accept="image/*">
             <div id="cropper-v"></div>
             <button id="crop-button" class="btn-crop">אשר חיתוך תמונה ✔</button>
@@ -183,8 +165,14 @@
         <!-- שלב 2: משפחה -->
         <div id="step-2" class="step-content">
             <h2>פרטי משפחה</h2>
-            <label>עיסוק האב</label><input id="in-f-job" oninput="update()">
-            <label>עיסוק האם</label><input id="in-m-job" oninput="update()">
+            <div style="display: flex; gap: 10px;">
+                <div style="flex:1"><label>שם האב</label><input id="in-f-name" oninput="update()"></div>
+                <div style="flex:1"><label>עיסוק האב</label><input id="in-f-job" oninput="update()"></div>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <div style="flex:1"><label>שם האם</label><input id="in-m-name" oninput="update()"></div>
+                <div style="flex:1"><label>עיסוק האם</label><input id="in-m-job" oninput="update()"></div>
+            </div>
             <label>האם לבית (שם משפחה)</label><input id="in-m-maiden" oninput="update()">
             
             <h3>אחים ואחיות</h3>
@@ -232,8 +220,8 @@
 
             <div class="pdf-section-title">פרטי הורים</div>
             <div class="pdf-grid" id="parent-grid">
-                <div class="pdf-row"><b>עיסוק האב:</b> <span id="out-f-job">--</span></div>
-                <div class="pdf-row"><b>עיסוק האם:</b> <span id="out-m-job">--</span></div>
+                <div class="pdf-row"><b>האב:</b> <span id="out-f-name">--</span> (<span id="out-f-job">--</span>)</div>
+                <div class="pdf-row"><b>האם:</b> <span id="out-m-name">--</span> (<span id="out-m-job">--</span>)</div>
                 <div class="pdf-row"><b>האם לבית:</b> <span id="out-m-maiden">--</span></div>
             </div>
 
@@ -342,10 +330,13 @@
     }
 
     function update() {
-        const ids = ['name', 'age', 'height', 'city', 'traits', 'f-job', 'm-job', 'm-maiden', 'school', 'job'];
+        const ids = ['name', 'age', 'height', 'city', 'traits', 'f-name', 'f-job', 'm-name', 'm-job', 'm-maiden', 'school', 'job'];
         ids.forEach(id => {
-            const v = document.getElementById('in-'+id).value;
-            if(document.getElementById('out-'+id)) document.getElementById('out-'+id).innerText = v || '--';
+            const input = document.getElementById('in-'+id);
+            if(input) {
+                const v = input.value;
+                if(document.getElementById('out-'+id)) document.getElementById('out-'+id).innerText = v || '--';
+            }
         });
 
         document.getElementById('out-sub').innerText = `בת ${document.getElementById('in-age').value || '--'}, גובה ${document.getElementById('in-height').value || '--'} | ${document.getElementById('in-city').value || '--'}`;
